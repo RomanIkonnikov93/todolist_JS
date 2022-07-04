@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>toDoList</title>
+
+    <style>
+
+        html {
+            overflow-x: hidden;
+            margin-right: calc(-1 * (100vw - 100%));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            text-align: center;
+            color: white;
+            background-color: green;
+            font-size: 18px;
+            padding: 5px;
+            border: none;
+            font-family: Georgia, serif;
+        }
+
+        .btn:hover {
+            background-color: forestgreen;
+            box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.10);
+        }
+
+        .btn:active {
+            background-color: green;
+            transform: translate(0px, 2px);
+        }
+
+        button {
+            text-align: center;
+            color: white;
+            background-color: rgba(139, 0, 0, 0.87);
+            font-family: Georgia, serif;
+            font-size: 15px;
+            padding: 5px;
+            margin-left: 5px;
+            border: none;
+
+        }
+
+        button:hover {
+            background-color: red;
+            box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.10);
+        }
+
+        button:active {
+            background-color: darkred;
+            transform: translate(0px, 2px);
+        }
+
+        input[type="checkbox"] {
+            transform: scale(2.3);
+            margin: 15px;
+            cursor: pointer;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        input[type=text]:focus {
+            background-color: rgba(4, 51, 229, 0.1);
+        }
+
+        .inp {
+            font-size: 18px;
+            font-weight: 500;
+            padding: 3px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            margin-right: 5px;
+            font-family: Georgia, serif;
+            width: 285px;
+        }
+
+        .todo {
+            font-size: 20px;
+            font-family: Georgia, serif;
+            font-weight: 500;
+            background-color: darkorange;
+            border-radius: 10px;
+        }
+
+        input[type="checkbox"]:checked {
+            transform: scale(1.7);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div>
+    <input class="inp"
+           type="text"
+           placeholder="Введите заметку"
+           maxlength="30"
+    />
+    <input class="btn"
+           type="submit"
+           value="Добавить"
+    />
+</div>
+
+<div class="list">
+    <ul class="todo">
+    </ul>
+</div>
+
+<script onload="">
+
+    const addNote = document.querySelector('.inp');
+    const addBtn = document.querySelector('.btn');
+    const todo = document.querySelector('.todo');
+
+    let arr = [];
+
+    if (localStorage.getItem('noteList')) {
+        arr = JSON.parse(localStorage.getItem('noteList'));
+        doNote();
+    }
+
+    addNote.addEventListener('keyup', function (event) {
+        if (addNote.value !== '') {
+            if (event.code === 'Enter') {
+                const note = {
+                    note: addNote.value,
+                    checked: false,
+                };
+                arr.push(note);
+                doNote();
+                localStorage.setItem('noteList', JSON.stringify(arr));
+                addNote.value = '';
+            }
+        } else {
+            alert('Введите текст заметки!');
+        }
+    });
+
+    addBtn.addEventListener('click', function () {
+        if (addNote.value !== '') {
+            const note = {
+                note: addNote.value,
+                checked: false,
+            };
+            arr.push(note);
+            doNote();
+            localStorage.setItem('noteList', JSON.stringify(arr));
+            addNote.value = '';
+        } else {
+            alert('Введите текст заметки!');
+        }
+    });
+
+    function done(event) {
+        let x = arr[event.id];
+        let y = document.getElementById(event.id);
+        if (y.checked) {
+            x.checked = true;
+        } else {
+            x.checked = false;
+        }
+        localStorage.setItem('noteList', JSON.stringify(arr));
+    }
+
+    function delNote(event) {
+        arr.splice(event.id, 1);
+        localStorage.setItem('noteList', JSON.stringify(arr));
+        doNote();
+        if (arr.length < 1) {
+            document.querySelector('li').remove();
+        }
+    }
+
+
+    function doNote() {
+        let notes = '';
+
+        arr.forEach(function (item, idx) {
+            notes += `
+          <li>
+          <input
+          type="checkbox"
+          id='${idx}'
+          onclick='done(event.target)'
+          ${item.checked ? 'checked' : ''}
+          >${item.note}</input>
+          <button
+          onclick='delNote(event.target)'
+          id='${idx}'
+          >Удалить</button>
+          </li>
+          `;
+            todo.innerHTML = notes;
+        });
+    }
+
+</script>
+
+</body>
+</html>
